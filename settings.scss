@@ -1,0 +1,14 @@
+/* $welcome-green: #328e32;
+$welcome-purple: #9658b7;
+$welcome-blue: #1063ad;
+$welcome-light-grey: #9f9f9f; */
+
+$body-font-family: "Schibsted Grotesk";
+
+@forward "vuetify/settings" with (
+  $toolbar-title-line-height: "unset"
+);
+
+html {
+  font-family: $body-font-family, Roboto, Helvetica Neue, Arial, sans-serif !important;
+}

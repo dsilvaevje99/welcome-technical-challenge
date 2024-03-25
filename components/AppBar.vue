@@ -1,0 +1,27 @@
+<template>
+  <v-app-bar flat height="100" scroll-behavior="hide">
+    <template v-slot:prepend>
+      <v-app-bar-nav-icon
+        class="d-block d-lg-none"
+        @click.stop="store.toggleDrawerOpen"
+      ></v-app-bar-nav-icon>
+    </template>
+
+    <v-app-bar-title class="text-h3 font-weight-bold overflow-y-visible">
+      Welcome <span class="text-secondary">Library</span></v-app-bar-title
+    >
+
+    <template v-slot:append>
+      <v-btn class="hidden-md-and-down" prepend-icon="mdi-google"
+        >Login with Google</v-btn
+      >
+      <v-btn icon="mdi-cart" color="action" class="mr-3"></v-btn>
+    </template>
+  </v-app-bar>
+</template>
+
+<script setup lang="ts">
+import { useSystemStore } from "~/stores/system";
+
+const store = useSystemStore();
+</script>
