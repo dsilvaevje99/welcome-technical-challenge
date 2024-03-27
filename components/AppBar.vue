@@ -7,7 +7,11 @@
       ></v-app-bar-nav-icon>
     </template>
 
-    <v-app-bar-title class="text-h3 font-weight-bold overflow-y-visible">
+    <v-app-bar-title
+      :class="`${
+        $vuetify.display.smAndUp && 'text-h4'
+      } font-weight-bold overflow-y-visible`"
+    >
       Welcome <span class="text-secondary">Library</span></v-app-bar-title
     >
 
