@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     "@mdi/font/css/materialdesignicons.min.css",
   ],
   modules: [
+    "nuxt-server-utils",
     "@pinia/nuxt",
     [
       "@nuxtjs/google-fonts",
