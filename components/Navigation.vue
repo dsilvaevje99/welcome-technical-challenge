@@ -26,7 +26,7 @@ const store = useSystemStore();
 
 const routes = [
   {
-    icon: "mdi-view-dashboard",
+    icon: "mdi-book",
     label: "Library",
     route: "/",
   },
