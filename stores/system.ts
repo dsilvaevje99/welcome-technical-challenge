@@ -2,7 +2,7 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 
 export const useSystemStore = defineStore("system", () => {
-  const drawerOpen = ref(false);
+  const drawerOpen = ref<boolean>(false);
 
   const toggleDrawerOpen = () => (drawerOpen.value = !drawerOpen.value);
 

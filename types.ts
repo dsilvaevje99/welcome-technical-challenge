@@ -32,3 +32,22 @@ export type BookFilters = {
   sort: SortOption;
   genres: string[][];
 };
+
+export type User = {
+  email: string;
+  checked_out: UserBook[];
+  history: UserBook[];
+};
+
+export type UserBook = {
+  _id: any;
+  book: BookDetails;
+  timestamp: Date;
+};
+
+export type BookReqBody = {
+  books: {
+    book: string; // book ID
+    timestamp: Date;
+  }[];
+};

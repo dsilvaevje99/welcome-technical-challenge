@@ -6,8 +6,21 @@
     link
     class="pt-4 text-center card-container"
   >
+    <div v-if="borrowed" class="actions-container">
+      <v-tooltip text="Return book" location="end">
+        <template v-slot:activator="{ props }">
+          <v-btn
+            v-bind="props"
+            @click.stop.prevent="() => handleReturn(book._id)"
+            size="small"
+            icon="mdi-book-arrow-left"
+            color="action"
+          ></v-btn>
+        </template>
+      </v-tooltip>
+    </div>
     <v-chip
-      v-if="noCopiesAvailable"
+      v-else-if="noCopiesAvailable"
       color="red-darken-4"
       variant="flat"
       size="small"
@@ -29,6 +42,7 @@
         <template v-slot:activator="{ props }">
           <v-btn
             v-bind="props"
+            @click.stop.prevent="() => handleQuickBorrow(book._id)"
             size="small"
             icon="mdi-cursor-pointer"
             color="accent"
@@ -50,11 +64,15 @@
     </v-card-title>
     <v-card-subtitle class="text-wrap">{{ book.authors }}</v-card-subtitle>
     <v-card-text class="pt-0">
-      <StarRatings :book="book" class="justify-center" />
+      <StarRatings v-if="!timestamp" :book="book" class="justify-center" />
       <span v-if="book.published_year"
         >Published {{ book.published_year }}</span
       >
       <span v-else>Unknown year of publication</span>
+      <span v-if="timestamp" class="d-block mt-2 font-weight-bold text-action">
+        {{ borrowed ? "Borrowed" : "Returned" }}
+        {{ new Date(timestamp).toLocaleDateString() }}
+      </span>
     </v-card-text>
   </v-card>
 </template>
@@ -62,16 +80,48 @@
 <script setup lang="ts">
 import type { Book } from "~/types";
 
+const router = useRouter();
+const store = useUserStore();
+
 const props = defineProps({
   book: {
     type: Object as () => Book,
     required: true,
+  },
+  timestamp: {
+    type: Date,
+    required: false,
+    default: null,
+  },
+  borrowed: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 });
 
 const noCopiesAvailable = computed<boolean>(
   () => props.book.stock === props.book.checked_out
 );
+
+const handleQuickBorrow = async (_id: string) => {
+  const borrowed = await store.borrowBook({
+    books: [{ book: _id, timestamp: new Date() }],
+  });
+  if (borrowed) {
+    store.tab = 1;
+    router.push("/my-page");
+  }
+};
+
+const handleReturn = async (_id: string) => {
+  const returned = await store.returnBook({
+    books: [{ book: _id, timestamp: new Date() }],
+  });
+  if (returned) {
+    store.tab = 2;
+  }
+};
 </script>
 
 <style scoped lang="scss">
