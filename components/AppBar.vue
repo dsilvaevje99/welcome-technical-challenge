@@ -16,9 +16,7 @@
     >
 
     <template v-slot:append>
-      <v-btn class="hidden-md-and-down" prepend-icon="mdi-google"
-        >Login with Google</v-btn
-      >
+      <AuthButton class="mr-10 hidden-md-and-down" />
       <v-btn icon="mdi-cart" color="action" class="mr-3"></v-btn>
     </template>
   </v-app-bar>

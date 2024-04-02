@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     "@mdi/font/css/materialdesignicons.min.css",
   ],
   modules: [
+    "@sidebase/nuxt-auth",
     "nuxt-server-utils",
     "@pinia/nuxt",
     [
@@ -39,6 +40,11 @@ export default defineNuxtConfig({
           styles: { configFile: resolve("./settings.scss") },
         })
       );
+    },
+  },
+  auth: {
+    provider: {
+      type: "authjs",
     },
   },
   components: [

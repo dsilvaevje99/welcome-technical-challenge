@@ -9,12 +9,7 @@
         :title="route.label"
         :value="route.label"
       ></v-list-item>
-      <v-list-item
-        class="mt-12 hidden-lg-and-up"
-        prepend-icon="mdi-google"
-        title="Login with Google"
-        value="Google"
-      ></v-list-item>
+      <AuthButton class="mt-12 hidden-lg-and-up" />
     </v-list>
   </v-navigation-drawer>
 </template>
