@@ -46,7 +46,11 @@ export const useUserStore = defineStore("user", () => {
       const { data: borrowed } = await useFetch<UserBook[]>(
         "/api/user/borrowed"
       );
-      currBorrowed.value = borrowed.value || [];
+      currBorrowed.value =
+        borrowed.value?.sort(
+          ({ timestamp: a }, { timestamp: b }) =>
+            new Date(b).getTime() - new Date(a).getTime()
+        ) || [];
     } catch (e) {
       console.error(e);
     }
@@ -55,7 +59,11 @@ export const useUserStore = defineStore("user", () => {
   const fetchBorrowHistory = async () => {
     try {
       const { data: history } = await useFetch<UserBook[]>("/api/user/history");
-      prevBorrowed.value = history.value || [];
+      prevBorrowed.value =
+        history.value?.sort(
+          ({ timestamp: a }, { timestamp: b }) =>
+            new Date(b).getTime() - new Date(a).getTime()
+        ) || [];
     } catch (e) {
       console.error(e);
     }
