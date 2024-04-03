@@ -46,10 +46,18 @@
         <v-container v-if="copiesAvailable">
           <v-row>
             <v-col cols="auto">
-              <v-btn color="action" prepend-icon="mdi-cart">Add to cart</v-btn>
+              <v-btn
+                @click="() => cart.books.push(book)"
+                color="action"
+                prepend-icon="mdi-cart"
+                >Add to cart</v-btn
+              >
             </v-col>
             <v-col cols="auto">
-              <v-btn color="accent" prepend-icon="mdi-cursor-pointer"
+              <v-btn
+                @click="() => handleQuickBorrow(book._id)"
+                color="accent"
+                prepend-icon="mdi-cursor-pointer"
                 >Borrow with one click</v-btn
               >
             </v-col>
@@ -105,6 +113,9 @@ import { useDisplay } from "vuetify";
 import { watch } from "vue";
 
 const { params } = useRoute();
+const router = useRouter();
+const store = useUserStore();
+const cart = useCartStore();
 
 const currBreakpoint = ref(useDisplay());
 const book = ref<BookDetails | null>(null);
@@ -117,6 +128,16 @@ const thumbnailWidth = computed(() =>
 const copiesAvailable = computed<number>(() =>
   book.value ? book.value.stock - book.value.checked_out : 0
 );
+
+const handleQuickBorrow = async (_id: string) => {
+  const borrowed = await store.borrowBook({
+    books: [{ book: _id, timestamp: new Date() }],
+  });
+  if (borrowed) {
+    store.tab = 1;
+    router.push("/my-page");
+  }
+};
 
 const fetchSimilarBooks = async () => {
   if (!book.value) return;

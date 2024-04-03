@@ -14,6 +14,7 @@ export default defineNuxtConfig({
     "@sidebase/nuxt-auth",
     "nuxt-server-utils",
     "@pinia/nuxt",
+    "@pinia-plugin-persistedstate/nuxt",
     [
       "@nuxtjs/google-fonts",
       {
@@ -26,7 +27,7 @@ export default defineNuxtConfig({
     ],
   ],
   build: {
-    transpile: ["vuetify"],
+    transpile: ["vuetify", "pinia-plugin-persistedstate"],
   },
   vite: {
     define: {

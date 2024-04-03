@@ -6,49 +6,78 @@
     link
     class="pt-4 text-center card-container"
   >
-    <div v-if="borrowed" class="actions-container">
-      <v-tooltip text="Return book" location="end">
-        <template v-slot:activator="{ props }">
-          <v-btn
-            v-bind="props"
-            @click.stop.prevent="() => handleReturn(book._id)"
-            size="small"
-            icon="mdi-book-arrow-left"
-            color="action"
-          ></v-btn>
-        </template>
-      </v-tooltip>
-    </div>
     <v-chip
-      v-else-if="noCopiesAvailable"
-      color="red-darken-4"
+      v-if="addedToCart && !inCart && !borrowed"
+      @click.stop.prevent="() => cart.removeBook(book._id)"
+      color="green"
       variant="flat"
       size="small"
-      class="unavailable-chip"
-      >Currently Unavailable</v-chip
+      class="card-chip"
+      ><v-icon class="mr-1">mdi-check</v-icon> Added to cart</v-chip
     >
-    <div v-else class="actions-container">
-      <v-tooltip text="Add to cart" location="end">
-        <template v-slot:activator="{ props }">
-          <v-btn
-            v-bind="props"
-            size="small"
-            icon="mdi-cart"
-            color="action"
-          ></v-btn>
-        </template>
-      </v-tooltip>
-      <v-tooltip text="One-click borrow" location="end">
-        <template v-slot:activator="{ props }">
-          <v-btn
-            v-bind="props"
-            @click.stop.prevent="() => handleQuickBorrow(book._id)"
-            size="small"
-            icon="mdi-cursor-pointer"
-            color="accent"
-          ></v-btn>
-        </template>
-      </v-tooltip>
+    <div v-if="!disableAllActions" :style="{ display: 'contents' }">
+      <div v-if="inCart" class="actions-container">
+        <v-tooltip text="Remove from cart" location="end">
+          <template v-slot:activator="{ props }">
+            <v-btn
+              v-bind="props"
+              @click.stop.prevent="() => cart.removeBook(book._id)"
+              size="small"
+              icon="mdi-book-minus"
+              color="primary"
+            ></v-btn>
+          </template>
+        </v-tooltip>
+      </div>
+      <div v-else-if="borrowed" class="actions-container">
+        <v-tooltip text="Return book" location="end">
+          <template v-slot:activator="{ props }">
+            <v-btn
+              v-bind="props"
+              @click.stop.prevent="() => handleReturn(book._id)"
+              size="small"
+              icon="mdi-book-arrow-left"
+              color="action"
+            ></v-btn>
+          </template>
+        </v-tooltip>
+      </div>
+      <v-chip
+        v-else-if="noCopiesAvailable"
+        color="red-darken-4"
+        variant="flat"
+        size="small"
+        class="card-chip"
+        >Currently Unavailable</v-chip
+      >
+      <div v-else class="actions-container">
+        <v-tooltip text="Add to cart" location="end">
+          <template v-slot:activator="{ props }">
+            <v-btn
+              v-bind="props"
+              @click.stop.prevent="() => cart.books.push(book)"
+              size="small"
+              icon="mdi-cart"
+              color="action"
+            ></v-btn>
+          </template>
+        </v-tooltip>
+        <v-tooltip
+          v-if="status === 'authenticated'"
+          text="One-click borrow"
+          location="end"
+        >
+          <template v-slot:activator="{ props }">
+            <v-btn
+              v-bind="props"
+              @click.stop.prevent="() => handleQuickBorrow(book._id)"
+              size="small"
+              icon="mdi-cursor-pointer"
+              color="accent"
+            ></v-btn>
+          </template>
+        </v-tooltip>
+      </div>
     </div>
     <v-img height="200" :src="book.thumbnail">
       <template v-slot:placeholder>
@@ -80,8 +109,10 @@
 <script setup lang="ts">
 import type { Book } from "~/types";
 
+const { status } = useAuth();
 const router = useRouter();
 const store = useUserStore();
+const cart = useCartStore();
 
 const props = defineProps({
   book: {
@@ -98,10 +129,26 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  inCart: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  disableActions: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 const noCopiesAvailable = computed<boolean>(
   () => props.book.stock === props.book.checked_out
+);
+const addedToCart = computed<boolean>(() =>
+  props.inCart ? false : !!cart.books.find((b) => b._id === props.book._id)
+);
+const disableAllActions = computed<boolean>(
+  () => props.disableActions || addedToCart.value
 );
 
 const handleQuickBorrow = async (_id: string) => {
@@ -128,7 +175,7 @@ const handleReturn = async (_id: string) => {
 .card-container {
   position: relative;
 
-  .unavailable-chip {
+  .card-chip {
     position: absolute;
     top: 0.5rem;
     left: 0.5rem;

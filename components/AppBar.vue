@@ -17,13 +17,27 @@
 
     <template v-slot:append>
       <AuthButton class="mr-10 hidden-md-and-down" />
-      <v-btn icon="mdi-cart" color="action" class="mr-3"></v-btn>
+      <v-btn is="NavLink" to="/cart" icon color="action" class="mr-6">
+        <template #default>
+          <v-badge
+            v-if="cart.count"
+            :content="cart.count"
+            floating
+            color="green"
+          >
+            <v-icon>mdi-cart</v-icon>
+          </v-badge>
+          <v-icon v-else>mdi-cart</v-icon>
+        </template>
+      </v-btn>
     </template>
   </v-app-bar>
 </template>
 
 <script setup lang="ts">
 import { useSystemStore } from "~/stores/system";
+import { useCartStore } from "~/stores/cart";
 
 const store = useSystemStore();
+const cart = useCartStore();
 </script>
