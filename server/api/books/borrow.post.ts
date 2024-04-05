@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const user = await User.findOneAndUpdate(
     { email: session.user?.email },
     { $push: { checked_out: { $each: body.books } } },
-    { new: true }
+    { upsert: true, new: true, setDefaultsOnInsert: true }
   );
 
   const bookIds = body.books.map(({ book }) => book);
