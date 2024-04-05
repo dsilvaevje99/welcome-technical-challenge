@@ -98,7 +98,12 @@
         >Published {{ book.published_year }}</span
       >
       <span v-else>Unknown year of publication</span>
-      <span v-if="timestamp" class="d-block mt-2 font-weight-bold text-action">
+      <span
+        v-if="timestamp"
+        :class="`d-block mt-2 font-weight-bold text-${
+          borrowed ? 'action' : 'success'
+        }`"
+      >
         {{ borrowed ? "Borrowed" : "Returned" }}
         {{ new Date(timestamp).toLocaleDateString() }}
       </span>
