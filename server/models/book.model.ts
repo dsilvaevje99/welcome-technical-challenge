@@ -10,6 +10,7 @@ const BookSchema = new Schema({
   description: String,
   published_year: String,
   average_rating: String,
+  ratings_count: String,
   num_pages: String,
   stock: Number,
   checked_out: Number,

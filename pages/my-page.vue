@@ -76,6 +76,4 @@ definePageMeta({ middleware: "auth" });
 
 const { data } = useAuth();
 const store = useUserStore();
-
-store.initialize();
 </script>

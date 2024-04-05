@@ -54,4 +54,12 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
+  routeRules: {
+    "/admin": {
+      ssr: false,
+    },
+    "/admin/**": {
+      ssr: false,
+    },
+  },
 });

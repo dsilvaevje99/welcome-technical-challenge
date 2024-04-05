@@ -18,8 +18,9 @@
 import { useSystemStore } from "~/stores/system";
 
 const store = useSystemStore();
+const user = useUserStore();
 
-const routes = [
+const routes = computed(() => [
   {
     icon: "mdi-book",
     label: "Library",
@@ -30,10 +31,14 @@ const routes = [
     label: "My page",
     route: "/my-page",
   },
-  {
-    icon: "mdi-key",
-    label: "Admin dashboard",
-    route: "/admin",
-  },
-];
+  ...(user.isAdmin
+    ? [
+        {
+          icon: "mdi-key",
+          label: "Admin dashboard",
+          route: "/admin",
+        },
+      ]
+    : []),
+]);
 </script>

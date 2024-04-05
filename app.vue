@@ -13,6 +13,12 @@
   </v-app>
 </template>
 
+<script setup lang="ts">
+const user = useUserStore();
+
+user.initialize();
+</script>
+
 <style lang="scss">
 @use "./settings";
 </style>

@@ -15,5 +15,5 @@ export default defineEventHandler(async (event) => {
 
   await user?.populate("checked_out.book");
 
-  return user?.checked_out || [];
+  return user;
 });

@@ -15,5 +15,5 @@ export default defineEventHandler(async (event) => {
 
   await user?.populate("history.book");
 
-  return user?.history || [];
+  return user;
 });

@@ -2,25 +2,7 @@
   <v-container>
     <v-row>
       <v-col cols="12" class="pb-0">
-        <v-text-field
-          name="Search"
-          v-model="store.searchTerm"
-          variant="outlined"
-          placeholder="Search by title, author or isbn13..."
-          clearable
-          rounded
-          flat
-        >
-          <template #prepend-inner>
-            <v-progress-circular
-              v-if="store.searching"
-              indeterminate
-              size="24"
-              width="2"
-            ></v-progress-circular>
-            <v-icon v-else>mdi-magnify</v-icon>
-          </template>
-        </v-text-field>
+        <SearchBar v-model="store.searchTerm" />
       </v-col>
       <v-col cols="12" class="pt-0">
         <BookFilters />
@@ -92,26 +74,27 @@ const handleScrollToTop = () => {
 };
 
 const handleScroll = () => {
-  window.onscroll = () => {
-    const closeToBottomOfWindow =
-      Math.max(document.documentElement.scrollTop, document.body.scrollTop) +
-        window.innerHeight >
-      document.documentElement.offsetHeight - 300;
+  const closeToBottomOfWindow =
+    Math.max(document.documentElement.scrollTop, document.body.scrollTop) +
+      window.innerHeight >
+    document.documentElement.offsetHeight - 300;
 
-    if (closeToBottomOfWindow) {
-      showScrollToTopBtn.value = true;
-      if (moreBooksToFetch.value) {
-        store.fetchBooks();
-      }
+  if (closeToBottomOfWindow) {
+    showScrollToTopBtn.value = true;
+    if (moreBooksToFetch.value) {
+      store.fetchBooks(false);
+      store.page = store.page + 1;
     }
-  };
+  }
 };
 
 onMounted(() => {
-  handleScroll();
+  window.addEventListener("scroll", handleScroll);
   // Necessary workaround for Nuxt to call fetch in store
   setTimeout(() => {
-    store.fetchBooks();
+    if (store.page === 1) store.fetchBooks(true);
   }, 1);
 });
+
+onBeforeUnmount(() => window.removeEventListener("scroll", handleScroll));
 </script>

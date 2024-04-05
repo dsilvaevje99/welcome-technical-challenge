@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import type { BookReqBody, User, UserBook } from "~/types";
 
 export const useUserStore = defineStore("user", () => {
+  const isAdmin = ref<boolean>(false);
   const tab = ref<number>(1);
   const currBorrowed = ref<UserBook[]>([]);
   const prevBorrowed = ref<UserBook[]>([]);
@@ -43,11 +44,10 @@ export const useUserStore = defineStore("user", () => {
 
   const fetchBorrowedBooks = async () => {
     try {
-      const { data: borrowed } = await useFetch<UserBook[]>(
-        "/api/user/borrowed"
-      );
+      const { data: user } = await useFetch<User>("/api/user/borrowed");
+      isAdmin.value = user.value?.role === "admin";
       currBorrowed.value =
-        borrowed.value?.sort(
+        user.value?.checked_out.sort(
           ({ timestamp: a }, { timestamp: b }) =>
             new Date(b).getTime() - new Date(a).getTime()
         ) || [];
@@ -58,9 +58,10 @@ export const useUserStore = defineStore("user", () => {
 
   const fetchBorrowHistory = async () => {
     try {
-      const { data: history } = await useFetch<UserBook[]>("/api/user/history");
+      const { data: user } = await useFetch<User>("/api/user/history");
+      isAdmin.value = user.value?.role === "admin";
       prevBorrowed.value =
-        history.value?.sort(
+        user.value?.history.sort(
           ({ timestamp: a }, { timestamp: b }) =>
             new Date(b).getTime() - new Date(a).getTime()
         ) || [];
@@ -75,6 +76,7 @@ export const useUserStore = defineStore("user", () => {
   };
 
   return {
+    isAdmin,
     tab,
     currBorrowed,
     prevBorrowed,
