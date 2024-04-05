@@ -9,9 +9,9 @@
       <v-col cols="12">
         <BookForm
           v-model:valid="valid"
-          v-model:data="formData as BookDetails"
+          v-model:data="formData.book"
           :loading="editing"
-          :disabled="fetching || !Object.keys(formData).length"
+          :disabled="fetching || !formData.book"
           @submit="handleSubmit"
         />
       </v-col>
@@ -33,7 +33,9 @@ const notifications = useNotificationStore();
 const fetching = ref<boolean>(false);
 const editing = ref<boolean>(false);
 const valid = ref<boolean>(false);
-const formData = reactive<BookDetails | {}>({});
+const formData = reactive<{ book: BookDetails | undefined }>({
+  book: undefined,
+});
 
 const handleSubmit = async () => {
   editing.value = true;
@@ -60,7 +62,7 @@ const handleSubmit = async () => {
       notifications.addNotification(
         CustomNotificationType.SUCCESS,
         undefined,
-        `Edited book "${(formData as BookDetails).title}"`
+        `Edited book "${formData.book?.title}"`
       );
       editing.value = false;
       router.push("/admin");
@@ -86,7 +88,7 @@ onMounted(() => {
       return;
     }
     if (data.value) {
-      Object.assign(formData, data.value);
+      formData.book = data.value;
       valid.value = true;
     }
     fetching.value = false;
