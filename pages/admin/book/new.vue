@@ -21,10 +21,11 @@
 <script setup lang="ts">
 definePageMeta({ middleware: ["auth", "admin-only"] });
 
-import type { BookDetails } from "~/types";
+import { CustomNotificationType, type BookDetails } from "~/types";
 
 const router = useRouter();
 const store = useBookStore();
+const notifications = useNotificationStore();
 
 const creating = ref<boolean>(false);
 const valid = ref<boolean>(false);
@@ -48,16 +49,31 @@ const handleSubmit = async () => {
   if (!valid) return;
 
   creating.value = true;
-  const { data: created } = await useFetch<BookDetails>(
+  const { data: created, error } = await useFetch<BookDetails>(
     "/api/admin/book/create",
     {
       method: "POST",
       body: { books: [formData] },
     }
   );
+
+  if (error?.value) {
+    notifications.addNotification(
+      CustomNotificationType.ERROR,
+      error.value.data
+    );
+    creating.value = false;
+    return;
+  }
+
   if (created.value) {
     store.adminSearchTerm = created.value.isbn13;
     setTimeout(() => {
+      notifications.addNotification(
+        CustomNotificationType.SUCCESS,
+        undefined,
+        `Added book "${formData.title}"`
+      );
       creating.value = false;
       router.push("/admin");
     }, 1000);

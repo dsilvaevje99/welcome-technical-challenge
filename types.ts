@@ -1,3 +1,7 @@
+import type { VDataTable } from "vuetify/components";
+
+export type ReadonlyTableHeaders = VDataTable["$props"]["headers"];
+
 export type Book = {
   _id?: any;
   isbn13: string;
@@ -70,4 +74,18 @@ export type InputField = {
   required?: boolean;
   type?: string;
   placeholder?: string;
+};
+
+export enum CustomNotificationType {
+  SUCCESS = "success",
+  INFO = "info",
+  WARNING = "warning",
+  ERROR = "error",
+}
+
+export type CustomNotification = {
+  id: number;
+  type: CustomNotificationType;
+  title: string;
+  text: string;
 };

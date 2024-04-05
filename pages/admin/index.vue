@@ -59,7 +59,7 @@
                     is="NavLink"
                     :to="`/books/${item.isbn13}`"
                     icon="mdi-eye"
-                    variant="test"
+                    variant="text"
                     size="small"
                     color="primary"
                   ></v-btn>
@@ -89,8 +89,11 @@
 <script setup lang="ts">
 definePageMeta({ middleware: ["auth", "admin-only"] });
 
+import { CustomNotificationType, type ReadonlyTableHeaders } from "~/types";
+
 const store = useBookStore();
 const user = useUserStore();
+const notifications = useNotificationStore();
 
 const deleting = ref<string>("");
 
@@ -105,15 +108,32 @@ const handleFetchBooks = ({
 
 const handleDeleteBook = async (id: string) => {
   deleting.value = id;
-  const { data: deleted } = await useFetch<boolean>("/api/admin/book/delete", {
-    method: "DELETE",
-    body: {
-      ids: [id],
-    },
-  });
+  const { data: deleted, error } = await useFetch<boolean>(
+    "/api/admin/book/delete",
+    {
+      method: "DELETE",
+      body: {
+        ids: [id],
+      },
+    }
+  );
+
+  if (error?.value) {
+    notifications.addNotification(
+      CustomNotificationType.ERROR,
+      error.value.data
+    );
+    deleting.value = "";
+    return;
+  }
 
   if (deleted.value) {
     setTimeout(() => {
+      notifications.addNotification(
+        CustomNotificationType.SUCCESS,
+        undefined,
+        "Deleted book."
+      );
       user.initialize();
       handleFetchBooks({ page: store.page, itemsPerPage: store.pageSize });
       deleting.value = "";
@@ -123,7 +143,7 @@ const handleDeleteBook = async (id: string) => {
   }
 };
 
-const headers = [
+const headers: ReadonlyTableHeaders = [
   { title: "ISBN13", key: "isbn13", sortable: false },
   { title: "Title", key: "title", sortable: false },
   { title: "Authors", key: "authors", sortable: false },

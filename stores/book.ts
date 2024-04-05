@@ -1,11 +1,14 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { BOOK_PAGE_SIZE } from "~/constants";
+import { CustomNotificationType } from "~/types";
 import type { Book, BookFilters, GetBooksPayload } from "~/types";
 
 export const useBookStore = defineStore(
   "book",
   () => {
+    const notifications = useNotificationStore();
+
     const books = ref<Book[]>([]);
     const total = ref<number>(0);
     const page = ref<number>(1);
@@ -38,7 +41,7 @@ export const useBookStore = defineStore(
 
       loading.value = true;
       try {
-        const { data } = await useFetch<GetBooksPayload>(
+        const { data, error } = await useFetch<GetBooksPayload>(
           `/api/books?skip=${
             (currPage - 1) * itemsPerPage
           }&limit=${itemsPerPage}&term=${term || ""}&sortBy=${
@@ -47,6 +50,14 @@ export const useBookStore = defineStore(
             disableFilters ? "" : formattedGenreFilter.value
           }`
         );
+
+        if (error?.value) {
+          notifications.addNotification(
+            CustomNotificationType.ERROR,
+            error.value.data
+          );
+          throw new Error(error.value.data.statusMessage);
+        }
 
         if (data.value) {
           const fetchedBooks = data.value.books;
@@ -57,7 +68,9 @@ export const useBookStore = defineStore(
           }
           total.value = data.value.total;
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error(e);
+      }
       searching.value = false;
       loading.value = false;
     };

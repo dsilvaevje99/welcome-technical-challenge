@@ -5,6 +5,7 @@
   <v-app>
     <AppBar />
     <Navigation />
+    <Notifications />
     <v-main>
       <div class="px-1 px-md-6 px-lg-12">
         <NuxtPage />

@@ -47,7 +47,7 @@
           <v-row>
             <v-col cols="auto">
               <v-btn
-                @click="() => cart.books.push(book)"
+                @click="() => cart.books.push(book!)"
                 color="action"
                 prepend-icon="mdi-cart"
                 >Add to cart</v-btn
@@ -55,7 +55,7 @@
             </v-col>
             <v-col cols="auto">
               <v-btn
-                @click="() => handleQuickBorrow(book._id)"
+                @click="() => handleQuickBorrow(book!._id)"
                 color="accent"
                 prepend-icon="mdi-cursor-pointer"
                 >Borrow with one click</v-btn
@@ -108,6 +108,7 @@
 </template>
 
 <script setup lang="ts">
+import { CustomNotificationType } from "~/types";
 import type { Book, BookDetails, GetBooksPayload } from "~/types";
 import { useDisplay } from "vuetify";
 import { watch } from "vue";
@@ -116,9 +117,10 @@ const { params } = useRoute();
 const router = useRouter();
 const store = useUserStore();
 const cart = useCartStore();
+const notifications = useNotificationStore();
 
 const currBreakpoint = ref(useDisplay());
-const book = ref<BookDetails | null>(null);
+const book = ref<BookDetails>();
 const fetching = ref<boolean>(false);
 const similarBooks = ref<Book[]>([]);
 
@@ -126,7 +128,7 @@ const thumbnailWidth = computed(() =>
   currBreakpoint.value.xs ? "50%" : "100%"
 );
 const copiesAvailable = computed<number>(() =>
-  book.value ? book.value.stock - book.value.checked_out : 0
+  book.value?.stock ? book.value.stock - book.value.checked_out : 0
 );
 
 const handleQuickBorrow = async (_id: string) => {
@@ -157,7 +159,19 @@ onMounted(() => {
   // Necessary workaround for Nuxt to run fetch in frontend
   setTimeout(async () => {
     fetching.value = true;
-    const { data } = await useFetch<BookDetails>(`/api/books/${params.isbn13}`);
+    const { data, error } = await useFetch<BookDetails>(
+      `/api/books/${params.isbn13}`
+    );
+
+    if (error?.value) {
+      notifications.addNotification(
+        CustomNotificationType.ERROR,
+        error.value.data
+      );
+      fetching.value = false;
+      return;
+    }
+
     if (data.value) book.value = data.value;
     fetching.value = false;
   }, 1);

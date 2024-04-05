@@ -1,8 +1,11 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
+import { CustomNotificationType } from "~/types";
 import type { BookReqBody, User, UserBook } from "~/types";
 
 export const useUserStore = defineStore("user", () => {
+  const notifications = useNotificationStore();
+
   const isAdmin = ref<boolean>(false);
   const tab = ref<number>(1);
   const currBorrowed = ref<UserBook[]>([]);
@@ -10,11 +13,27 @@ export const useUserStore = defineStore("user", () => {
 
   const borrowBook = async (body: BookReqBody): Promise<Boolean> => {
     try {
-      const { data: user } = await useFetch<User>("/api/books/borrow", {
+      const { data: user, error } = await useFetch<User>("/api/books/borrow", {
         method: "POST",
         body,
       });
+
+      if (error?.value) {
+        notifications.addNotification(
+          CustomNotificationType.ERROR,
+          error.value.data
+        );
+        throw new Error(error.value.data.statusMessage);
+      }
+
       if (user.value) {
+        notifications.addNotification(
+          CustomNotificationType.SUCCESS,
+          undefined,
+          `Borrowed ${body.books.length} book${
+            body.books.length > 1 ? "s" : ""
+          }.`
+        );
         fetchBorrowedBooks();
         return true;
       }
@@ -27,11 +46,27 @@ export const useUserStore = defineStore("user", () => {
 
   const returnBook = async (body: BookReqBody): Promise<Boolean> => {
     try {
-      const { data: user } = await useFetch<User>("/api/books/return", {
+      const { data: user, error } = await useFetch<User>("/api/books/return", {
         method: "POST",
         body,
       });
+
+      if (error?.value) {
+        notifications.addNotification(
+          CustomNotificationType.ERROR,
+          error.value.data
+        );
+        throw new Error(error.value.data.statusMessage);
+      }
+
       if (user.value) {
+        notifications.addNotification(
+          CustomNotificationType.SUCCESS,
+          undefined,
+          `Returned ${body.books.length} book${
+            body.books.length > 1 ? "s" : ""
+          }.`
+        );
         initialize();
         return true;
       }
@@ -44,7 +79,16 @@ export const useUserStore = defineStore("user", () => {
 
   const fetchBorrowedBooks = async () => {
     try {
-      const { data: user } = await useFetch<User>("/api/user/borrowed");
+      const { data: user, error } = await useFetch<User>("/api/user/borrowed");
+
+      if (error?.value) {
+        notifications.addNotification(
+          CustomNotificationType.ERROR,
+          error.value.data
+        );
+        throw new Error(error.value.data.statusMessage);
+      }
+
       isAdmin.value = user.value?.role === "admin";
       currBorrowed.value =
         user.value?.checked_out.sort(
@@ -58,7 +102,16 @@ export const useUserStore = defineStore("user", () => {
 
   const fetchBorrowHistory = async () => {
     try {
-      const { data: user } = await useFetch<User>("/api/user/history");
+      const { data: user, error } = await useFetch<User>("/api/user/history");
+
+      if (error?.value) {
+        notifications.addNotification(
+          CustomNotificationType.ERROR,
+          error.value.data
+        );
+        throw new Error(error.value.data.statusMessage);
+      }
+
       isAdmin.value = user.value?.role === "admin";
       prevBorrowed.value =
         user.value?.history.sort(
