@@ -20,7 +20,7 @@ You have free tech selection, but it is desirable that the resulting application
 
 #### Technologies
 
-This is a Nuxt3 application using Vue3 (composition API), Vuetify (component library & theme), Pinia (store), Mongoose & MongoDB (database), SASS (styling), Google OAuth2 (authentication), Docker (deployment) and Yarn (package manager).
+This is a Nuxt3 application using Vue3 (composition API) & TypeScript, Vuetify (component library & theme), Pinia (store), Mongoose & MongoDB (database), SASS (styling), Google OAuth2 (authentication), Docker (deployment) and Yarn (package manager).
 
 #### Highlights
 
@@ -48,6 +48,7 @@ This is a Nuxt3 application using Vue3 (composition API), Vuetify (component lib
 4. Fixing minor bugs (there are minor things I've discovered but not had time to fix)
 5. Add more OAuth2 methods (Facebook, Apple, LinkedIn etc...)
 6. Find a better way to handle roles (currently just stored in database)
+7. Improve accessibility with aria-labels etc. and manual testing with a screen reader
 
 #### Reflections
 
@@ -65,9 +66,10 @@ yarn  install
 
 And add the following environment variables in a `.env` file
 
-1. MONGODB_URI
-2. GOOGLE_CLIENT_ID
-3. GOOGLE_CLIENT_SECRET
+1. SIDEBASE_AUTH_SECRET
+2. MONGODB_URI
+3. GOOGLE_CLIENT_ID
+4. GOOGLE_CLIENT_SECRET
 
 ### Development Server
 

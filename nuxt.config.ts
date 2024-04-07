@@ -34,6 +34,12 @@ export default defineNuxtConfig({
       "process.env.DEBUG": false,
     },
   },
+  nuxtServerUtils: {
+    mongodbUri: process.env.MONGODB_URI,
+  },
+  nitro: {
+    plugins: ["~/server/index.ts"],
+  },
   hooks: {
     "vite:extendConfig": (config) => {
       config.plugins?.push(
